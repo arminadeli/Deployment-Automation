@@ -1,0 +1,26 @@
+---
+- name: Installing At Lunch Filebeat
+  hosts: webservers
+  become: yes
+  tasks:
+  - name: Download filebeat .deb file
+    # Downloading System logs from Kibana
+    # for more info use http://xxx.xxx.xxx.xxx:5601/app/kibana#/home/tutorial/systemLogs
+    command: curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.6.1-amd64.deb
+
+  - name: Install Filebeat .deb
+    command: sudo dpkg -i filebeat-7.6.1-amd64.deb
+
+  - name: Drop in Filebeat.yml
+    copy:
+      src: /etc/ansible/files/filebeat-config.yml
+      dest: /etc/filebeat/filebeat.yml
+
+  - name: Configure system module
+    command: filebeat modules enable system
+
+  - name: Setup filebeat
+    command: filebeat setup
+
+  - name: Start filebeat service
+    command: service filebeat start
